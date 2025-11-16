@@ -1,0 +1,178 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *prev, *next;
+};
+
+struct node *head = NULL;
+
+void insertBeginning(int x) {
+    struct node *n = malloc(sizeof(struct node));
+    n->data = x;
+    n->prev = NULL;
+    n->next = head;
+    if (head) head->prev = n;
+    head = n;
+}
+
+void insertEnd(int x) {
+    struct node *n = malloc(sizeof(struct node));
+    n->data = x;
+    n->next = NULL;
+
+    if (!head) {
+        n->prev = NULL;
+        head = n;
+        return;
+    }
+
+    struct node *t = head;
+    while (t->next) t = t->next;
+    t->next = n;
+    n->prev = t;
+}
+
+void insertAfterValue(int key, int x) {
+    struct node *t = head;
+    while (t && t->data != key) t = t->next;
+    if (!t) return;
+
+    struct node *n = malloc(sizeof(struct node));
+    n->data = x;
+    n->next = t->next;
+    n->prev = t;
+
+    if (t->next) t->next->prev = n;
+    t->next = n;
+}
+
+void deleteBeginning() {
+    if (!head) return;
+    struct node *t = head;
+    head = head->next;
+    if (head) head->prev = NULL;
+    free(t);
+}
+
+void deleteEnd() {
+    if (!head) return;
+
+    if (!head->next) {
+        free(head);
+        head = NULL;
+        return;
+    }
+
+    struct node *t = head;
+    while (t->next) t = t->next;
+    t->prev->next = NULL;
+    free(t);
+}
+
+void deleteValue(int key) {
+    if (!head) return;
+
+    struct node *t = head;
+    while (t && t->data != key) t = t->next;
+    if (!t) return;
+
+    if (t->prev) t->prev->next = t->next;
+    else head = t->next;
+
+    if (t->next) t->next->prev = t->prev;
+
+    free(t);
+}
+
+int search(int key) {
+    struct node *t = head;
+    int pos = 1;
+    while (t) {
+        if (t->data == key) return pos;
+        t = t->next;
+        pos++;
+    }
+    return -1;
+}
+
+void displayForward() {
+    struct node *t = head;
+    while (t) {
+        printf("%d ", t->data);
+        t = t->next;
+    }
+    printf("\n");
+}
+
+void displayBackward() {
+    struct node *t = head;
+    if (!t) {
+        printf("\n");
+        return;
+    }
+    while (t->next) t = t->next;
+    while (t) {
+        printf("%d ", t->data);
+        t = t->prev;
+    }
+    printf("\n");
+}
+
+int main() {
+    int ch, x, key;
+
+    while (1) {
+        printf("\n1.Insert Beginning\n2.Insert End\n3.Insert After Value\n4.Delete Beginning\n5.Delete End\n6.Delete Value\n7.Search\n8.Display Forward\n9.Display Backward\n10.Exit\n");
+        scanf("%d", &ch);
+
+        if (ch == 10) break;
+
+        switch (ch) {
+            case 1:
+                scanf("%d", &x);
+                insertBeginning(x);
+                break;
+
+            case 2:
+                scanf("%d", &x);
+                insertEnd(x);
+                break;
+
+            case 3:
+                scanf("%d %d", &key, &x);
+                insertAfterValue(key, x);
+                break;
+
+            case 4:
+                deleteBeginning();
+                break;
+
+            case 5:
+                deleteEnd();
+                break;
+
+            case 6:
+                scanf("%d", &key);
+                deleteValue(key);
+                break;
+
+            case 7:
+                scanf("%d", &key);
+                x = search(key);
+                if (x == -1) printf("Not found\n");
+                else printf("Found at %d\n", x);
+                break;
+
+            case 8:
+                displayForward();
+                break;
+
+            case 9:
+                displayBackward();
+                break;
+        }
+    }
+    return 0;
+}
