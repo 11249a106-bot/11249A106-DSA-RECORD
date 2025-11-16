@@ -1,0 +1,134 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *head = NULL;
+
+void insertBeginning(int x) {
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->data = x;
+    newNode->next = head;
+    head = newNode;
+}
+
+void insertEnd(int x) {
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->data = x;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    struct node *temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+    temp->next = newNode;
+}
+
+void insertAfterValue(int key, int x) {
+    struct node *temp = head;
+    while (temp != NULL && temp->data != key)
+        temp = temp->next;
+
+    if (temp == NULL) return;
+
+    struct node *newNode = malloc(sizeof(struct node));
+    newNode->data = x;
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+void deleteBeginning() {
+    if (head == NULL) return;
+    struct node *temp = head;
+    head = head->next;
+    free(temp);
+}
+
+void deleteEnd() {
+    if (head == NULL) return;
+
+    if (head->next == NULL) {
+        free(head);
+        head = NULL;
+        return;
+    }
+
+    struct node *temp = head;
+    while (temp->next->next != NULL)
+        temp = temp->next;
+
+    free(temp->next);
+    temp->next = NULL;
+}
+
+void deleteValue(int key) {
+    if (head == NULL) return;
+
+    if (head->data == key) {
+        struct node *temp = head;
+        head = head->next;
+        free(temp);
+        return;
+    }
+
+    struct node *temp = head;
+    while (temp->next != NULL && temp->next->data != key)
+        temp = temp->next;
+
+    if (temp->next == NULL) return;
+
+    struct node *del = temp->next;
+    temp->next = temp->next->next;
+    free(del);
+}
+
+int search(int key) {
+    struct node *temp = head;
+    int pos = 1;
+    while (temp != NULL) {
+        if (temp->data == key)
+            return pos;
+        temp = temp->next;
+        pos++;
+    }
+    return -1;
+}
+
+void traverse() {
+    struct node *temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    insertBeginning(30);
+    insertBeginning(20);
+    insertBeginning(10);
+    insertEnd(40);
+    insertEnd(50);
+    insertAfterValue(30, 35);
+
+    traverse();
+
+    deleteBeginning();
+    deleteEnd();
+    deleteValue(30);
+
+    traverse();
+
+    int pos = search(35);
+    if (pos != -1) printf("Found at position %d\n", pos);
+    else printf("Not found\n");
+
+    return 0;
+}
